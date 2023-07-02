@@ -2,9 +2,7 @@ import React from "react";
 import { FormWrapper } from "@/components/FormWrapper";
 
 import { socialIconsData } from "@/data";
-import { SocialMediaLink, CompanyOverviewFormProps } from "@/types";
-
-import { SocialsServicesFormProps } from "@/types";
+import { SocialMediaLink, SocialsServicesFormProps } from "@/types";
 
 export function SocialMediaForm({
   topProductsServicesCategories,
@@ -23,9 +21,9 @@ export function SocialMediaForm({
     field: keyof SocialMediaLink,
     value: string
   ) => {
-    const updatedLinks = [...(socialMediaLinks || [])];
+    const updatedLinks = [...socialMediaLinks];
     updatedLinks[index] = {
-      ...(updatedLinks[index] || ({} as SocialMediaLink)),
+      ...updatedLinks[index],
       [field]: value,
     };
     updateFields({ socialMediaLinks: updatedLinks });
@@ -64,16 +62,19 @@ export function SocialMediaForm({
                 handleSocialPlatformChange(
                   index,
                   "platform",
-                  e.target.value || ""
+                  e.currentTarget.value
                 )
               }
             >
-              {socialIconsData.map((social, index) => (
+              {socialIconsData.map((social, idx) => (
                 <option
-                  key={index}
+                  key={idx}
                   className="flex gap-4 border rounded-md border-black h-8"
-                  value={link.platform}
-                  selected={link.platform === social.label}
+                  value={social.label}
+                  disabled={socialMediaLinks?.some(
+                    (link) => link.platform == social.label
+                  )}
+                  defaultValue="select"
                 >
                   {social.label}
                 </option>
@@ -93,9 +94,10 @@ export function SocialMediaForm({
         ))}
         <div className="flex justify-end">
           <button
-            className="w-fit text-black border rounded-md border-black h-8"
+            className="w-fit text-black border rounded-md border-black py-1 px-3"
             onClick={handleAddSocialPlatform}
             type="button"
+            disabled={socialMediaLinks?.length === 5}
           >
             Add more
           </button>

@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { FormWrapper } from "@/components/FormWrapper";
 import { CompanyOverviewFormProps } from "@/types";
+import FileInput from "../FileInput";
 
 export const CompanyOverviewForm = ({
   companyName,
@@ -48,7 +49,7 @@ export const CompanyOverviewForm = ({
         onChange={handleInputChange}
       />
       <label>Can you upload a high-resolution Square Logo?</label>
-      <input
+      <FileInput
         type="file"
         className="w-full border rounded-md border-black h-8"
         autoFocus
@@ -57,6 +58,7 @@ export const CompanyOverviewForm = ({
         name="uploadSquareLogo"
         accept="image/png,image/jpeg"
         onChange={handleInputChange}
+        value={uploadSquareLogo?.name}
       />
       <label>
         Are there any legal, privacy, or compliance requirements we should be

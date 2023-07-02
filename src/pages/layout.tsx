@@ -30,7 +30,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             Back
           </button>
         )}
-        <main className="relative h-screen px-2 pt-3 md:px-20 flex flex-col gap-16">
+        <main className="relative h-screen px-2 pt-3 md:px-20 flex flex-col justify-between my-5 gap-5">
           {children}
         </main>
       </section>

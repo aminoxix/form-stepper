@@ -29,7 +29,7 @@ export default function Stepper({
             <li
               key={step.name}
               className={`w-2/3 flex-grow ${
-                stepIdx !== steps.length - 1 ? "md:pb-auto pb-10" : ""
+                stepIdx !== steps.length - 1 ? "md:pb-0 pb-10" : ""
               } relative`}
             >
               {currentStep >= stepIdx ? (

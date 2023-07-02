@@ -40,29 +40,34 @@ export const INITIAL_DATA = {
 
 export const socialIconsData = [
   {
+    image: "/social-icons/website.svg",
+    label: "Select",
+    value: "select",
+  },
+  {
     image: "/social-icons/facebook.svg",
     label: "Facebook",
-    value: "Facebook",
+    value: "facebook",
   },
   {
     image: "/social-icons/twitter.svg",
     label: "Twitter",
-    value: "Twitter",
+    value: "twitter",
   },
   {
     image: "/social-icons/linkedin.svg",
     label: "LinkedIn",
-    value: "LinkedIn",
+    value: "linkedIn",
   },
   {
     image: "/social-icons/instagram.svg",
     label: "Instagram",
-    value: "Instagram",
+    value: "instagram",
   },
   {
     image: "/social-icons/youtube.svg",
     label: "YouTube",
-    value: "YouTube",
+    value: "youtube",
   },
 ];
 

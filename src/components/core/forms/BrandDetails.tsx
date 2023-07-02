@@ -2,6 +2,7 @@ import React from "react";
 import { FormWrapper } from "@/components/FormWrapper";
 
 import { BrandDetailsFormProps } from "@/types";
+import FileInput from "../FileInput";
 
 export function BrandDetailsForm({
   age,
@@ -10,17 +11,17 @@ export function BrandDetailsForm({
   brandDetails,
   updateFields,
 }: BrandDetailsFormProps) {
-  const handleInputChange = (event: {
-    target: { name: string; value: string };
-  }) => {
-    const { name, value } = event.target;
-    updateFields({ [name]: value });
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files } = event.target;
+    const updatedValue =
+      name === "uploadSquareLogo" ? (files ? files : null) : value;
+    updateFields({ [name]: updatedValue });
   };
 
   return (
     <FormWrapper className="flex flex-col gap-2 text-black">
       <label>Since how long have you been in business?</label>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <label>Years</label>
         <input
           className="w-1/2 border rounded-md border-black h-8"
@@ -43,12 +44,15 @@ export function BrandDetailsForm({
         />
       </div>
       <label>Upload your brand assets or merchandise resources below...</label>
-      <input
+      <FileInput
+        type="file"
         className="w-full border rounded-md border-black h-8"
+        autoFocus
         multiple
-        onChange={(files) => {
-          console.log(files.target.files);
-        }}
+        placeholder="Upload Image here"
+        name="uploadSquareLogo"
+        onChange={handleInputChange}
+        value={brandAssets.map((asset) => asset.name).join(", ")}
       />
       <label>Any other details you would like to share about your brand?</label>
       <input

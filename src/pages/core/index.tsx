@@ -45,35 +45,39 @@ const Core = () => {
 
   return (
     <MainLayout>
-      <div className="">
-        <div className="font-inter mx-2 mb-20 mt-6 flex flex-1 flex-col justify-between md:ml-12 md:mr-24 md:mt-10">
-          <div className="flex flex-col gap-5">
-            <Stepper steps={steps} currentStep={currentStepIndex} />
-            <div className="w-full rounded px-4">
-              <form onSubmit={onSubmit}>
-                {step}
-                <div className="mt-16 flex justify-around gap-4">
-                  {!isFirstStep && (
-                    <button
-                      type="button"
-                      onClick={back}
-                      className="flex w-32 justify-center rounded-md bg-gray-300 px-8 py-2 font-bold text-gray-800 hover:bg-gray-400"
-                    >
-                      Back
-                    </button>
-                  )}
+      <div className="font-inter mx-2 my-5 flex flex-1 flex-col justify-between md:ml-12 md:mr-24 ">
+        <div className="flex flex-col flex-1 justify-between">
+          <Stepper steps={steps} currentStep={currentStepIndex} />
+          <div className="w-full rounded px-4">
+            <form onSubmit={onSubmit}>
+              {step}
+              <div className="mt-16 flex justify-around gap-4">
+                {!isFirstStep && (
                   <button
-                    className="flex w-32 justify-center rounded-md bg-black px-8 py-2 font-bold text-white hover:bg-black"
                     type="button"
-                    onClick={!isLastStep ? next : () => void 0}
+                    onClick={back}
+                    className="flex w-32 justify-center rounded-md bg-gray-300 px-8 py-2 font-bold text-gray-800 hover:bg-gray-400"
                   >
-                    {steps.length - 1 === currentStepIndex && isLastStep
-                      ? "Save"
-                      : "Next"}
+                    Back
                   </button>
-                </div>
-              </form>
-            </div>
+                )}
+                <button
+                  className="flex w-32 justify-center rounded-md bg-black px-8 py-2 font-bold text-white hover:bg-black"
+                  type="button"
+                  onClick={
+                    !isLastStep
+                      ? next
+                      : () => {
+                          console.log(formData);
+                        }
+                  }
+                >
+                  {steps.length - 1 === currentStepIndex && isLastStep
+                    ? "Save"
+                    : "Next"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
