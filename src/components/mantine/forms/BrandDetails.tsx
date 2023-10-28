@@ -10,17 +10,19 @@ import { TextInput, FileInput, Text } from "@mantine/core";
 export function BrandDetailsForm({
   formData,
   updateFieldValue,
+  handleFileUpload,
 }: {
   formData: UseFormReturnType<
     FormDataType,
     (values: FormDataType) => FormDataType
   >;
   updateFieldValue: (name: string, value: any) => void;
+  handleFileUpload: (file: File | File[] | null, logoType: string) => void;
 }) {
   return (
     <FormWrapper>
       <form className="flex flex-col gap-4">
-        <div className="w-full">
+        <div className="w-full flex gap-4">
           <TextInput
             className="w-1/2"
             autoFocus
@@ -61,6 +63,7 @@ export function BrandDetailsForm({
           {...formData.getInputProps("brandAssets")}
           onChange={(files) => {
             updateFieldValue("brandAssets", files);
+            handleFileUpload(files, "brandAssets");
           }}
         />
         <TextInput
@@ -69,7 +72,7 @@ export function BrandDetailsForm({
           withAsterisk
           required
           type="text"
-          name="companyName"
+          name="brandDetails"
           {...formData.getInputProps("brandDetails")}
           label="Share your brand details & requirements here..."
           onChange={(value) =>

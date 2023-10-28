@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { api } from "@/utils/api";
 import type { AppProps } from "next/app";
 
 import localFont from "next/font/local";
@@ -11,10 +12,12 @@ const materialSymbols = localFont({
   weight: "100 700",
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+function App({ Component, pageProps }: AppProps) {
   return (
     <div className={materialSymbols.variable}>
       <Component {...pageProps} />
     </div>
   );
 }
+
+export default api.withTRPC(App);

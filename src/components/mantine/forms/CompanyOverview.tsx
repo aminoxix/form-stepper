@@ -10,12 +10,14 @@ import { TextInput, FileInput } from "@mantine/core";
 export function CompanyOverviewForm({
   formData,
   updateFieldValue,
+  handleFileUpload,
 }: {
   formData: UseFormReturnType<
     FormDataType,
     (values: FormDataType) => FormDataType
   >;
   updateFieldValue: (name: string, value: any) => void;
+  handleFileUpload: (file: File | File[] | null, logoType: string) => void;
 }) {
   return (
     <FormWrapper>
@@ -71,6 +73,7 @@ export function CompanyOverviewForm({
           {...formData.getInputProps("uploadSquareLogo")}
           onChange={(files) => {
             updateFieldValue("uploadSquareLogo", files);
+            handleFileUpload(files, "uploadSquareLogo");
           }}
         />
         <TextInput

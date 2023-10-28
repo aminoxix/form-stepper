@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StepperForm {
+  id                        String                  @id @default(cuid())
+  createdAt                 DateTime                @default(now())
+  updatedAt                 DateTime                @updatedAt
+  companyOverviewId         String                  @unique
+  socialMediaId             String                  @unique
+  brandDetailId             String                  @unique
+  companyOverview           CompanyOverview         @relation(fields: [companyOverviewId], references: [id])
+  socialMedia               SocialMediaDetails      @relation(fields: [socialMediaId], references: [id])
+  brandDetails              BrandDetails            @relation(fields: [brandDetailId], references: [id])
+
+  @@index([companyOverviewId])
+  @@index([socialMediaId])
+  @@index([brandDetailId])
+}
+
+model CompanyOverview {
+  id                        String          @id @default(cuid())
+  createdAt                 DateTime        @default(now())
+  updatedAt                 DateTime        @updatedAt
+  companyName               String          @unique
+  companyEmail              String          @unique
+  companyWebsite            String?
+  uploadSquareLogo          String
+  legalCompliances          String
+  stepperForm            StepperForm?
+}
+
+model SocialMediaDetails {
+  id                            String          @id @default(cuid())
+  createdAt                     DateTime        @default(now())
+  updatedAt                     DateTime        @updatedAt
+  topProductsServicesCategories String
+  facebookLink                  String
+  linkedinLink                  String
+  instagramLink                 String
+  youtubeLink                   String
+  xLink                         String
+  stepperForm                StepperForm?
+}
+
+model BrandDetails {
+  id                           String          @id @default(cuid())
+  createdAt                    DateTime        @default(now())
+  updatedAt                    DateTime        @updatedAt
+  brandAssets                  String[]
+  age                          String
+  location                     String
+  brandDetails                 String
+  stepperForm               StepperForm?
+}

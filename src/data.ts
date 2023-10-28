@@ -23,14 +23,13 @@ export const INITIAL_DATA = {
   companyName: "",
   companyURL: "",
   companyEmail: "",
-  selectedFile: null as File | null,
-  uploadSquareLogo: null as File | null,
+  uploadSquareLogo: "",
   privacyPolicy: "",
   topProductsServicesCategories: "",
   socialMediaLinks: [{ platform: "", url: "" }],
   age: "",
   location: "",
-  brandAssets: [] as File[],
+  brandAssets: [],
   brandDetails: "",
   targetEntities: "",
   targetEntitiesDetails: "",
@@ -40,34 +39,29 @@ export const INITIAL_DATA = {
 
 export const socialIconsData = [
   {
-    image: "/social-icons/website.svg",
-    label: "Select",
-    value: "select",
-  },
-  {
     image: "/social-icons/facebook.svg",
     label: "Facebook",
-    value: "facebook",
+    value: "Facebook",
   },
   {
     image: "/social-icons/twitter.svg",
     label: "Twitter",
-    value: "twitter",
+    value: "Twitter",
   },
   {
     image: "/social-icons/linkedin.svg",
     label: "LinkedIn",
-    value: "linkedIn",
+    value: "LinkedIn",
   },
   {
     image: "/social-icons/instagram.svg",
     label: "Instagram",
-    value: "instagram",
+    value: "Instagram",
   },
   {
     image: "/social-icons/youtube.svg",
     label: "YouTube",
-    value: "youtube",
+    value: "YouTube",
   },
 ];
 

@@ -7,13 +7,13 @@ export type FormDataType = {
   companyName: string;
   companyURL: string;
   companyEmail: string;
-  uploadSquareLogo: File | null;
+  uploadSquareLogo: string;
   socialMediaLinks: SocialMediaLink[] | [];
   privacyPolicy: string;
   topProductsServicesCategories: string;
   age: string;
   location: string;
-  brandAssets: File[] | null;
+  brandAssets: string[];
   brandDetails: string;
 };
 
@@ -27,8 +27,7 @@ export type CompanyOverviewFormData = {
   companyName: string;
   companyURL: string;
   companyEmail: string;
-  uploadSquareLogo: File | null; // Update the type
-  selectedFile: File | null; // Add the selectedFile field
+  uploadSquareLogo: File | null;
   privacyPolicy: string;
 };
 

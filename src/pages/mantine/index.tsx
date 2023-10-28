@@ -1,174 +1,299 @@
 import { useRouter } from "next/router";
-
-import React, { type FormEvent, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import MainLayout from "../layout";
+import { api } from "@/utils/api";
 
-import type { FormDataType } from "@/types";
-import { INITIAL_DATA, initialSteps } from "@/data";
+import { Button, TextInput } from "@mantine/core";
 
-import { Button, Group, Modal, Notification } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import {
+  type ColumnDef,
+  type SortingState,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import {
+  ArrowUpIcon,
+  MagnifyingGlassIcon,
+  Pencil1Icon,
+  PlusIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTable } from "@/components/ui/data-table";
+import { DataTablePagination } from "@/components/ui/pagination";
+import { notifications } from "@mantine/notifications";
 
-import { useForm } from "@mantine/form";
-import { CompanyOverviewForm } from "@/components/mantine/forms/CompanyOverview";
-import { SocialMediaForm } from "@/components/mantine/forms/SocialMedia";
-import { BrandDetailsForm } from "@/components/mantine/forms/BrandDetails";
+type TableType = {
+  id: string;
+  name: string;
+  email: string;
+  website: string | null;
+  location: string;
+  experience: string;
+  topProductsServicesCategories: string;
+};
 
-import MantineStepper from "@/components/mantine/Stepper";
+const MantineIndex = () => {
+  const router = useRouter();
 
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "@/firebase/firebase-config";
-import { doc, updateDoc } from "firebase/firestore";
+  const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
+  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-const Onboarding = () => {
-  const [active, setActive] = useState(1);
-  const [opened, { open, close }] = useDisclosure(false);
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
-  const formData = useForm<FormDataType>({
-    initialValues: INITIAL_DATA,
-    validateInputOnChange: true,
-    validate: {
-      companyName: (value) =>
-        value.length <= 2 ? "Company name is too short" : null,
-      companyURL: (value) => {
-        const regex = /^(http(s)?:\/\/)?[\w.-]+\.[a-z]{2,6}(:\d{1,5})?(\/.*)?$/;
-        return regex.test(value) ? null : "Invalid URL";
+  const { data: allStepperForm, refetch } =
+    api.stepper.getAllStepperForm.useQuery();
+
+  const { mutate: deleteMultipleStepperForm } =
+    api.stepper.deleteMultipleStepperForm.useMutation({
+      onSuccess: () => {
+        void refetch();
+        notifications.show({
+          title: "Deleted Successfully",
+          message: "Form has been deleted successfully!",
+          color: "green",
+        });
       },
-      companyEmail: (value) => {
-        const regex = /\S+@\S+\.\S+/;
-        return regex.test(value) ? null : "Invalid email";
+      onError: (error) => {
+        console.log("Error deleting stepper form", error);
+        notifications.show({
+          title: "Deletion Unsuccessful",
+          message: "Form has been failed to delete!",
+          color: "red",
+        });
       },
-      uploadSquareLogo: (value) =>
-        value?.length === 0 ? "Please upload a square logo" : null,
-      brandAssets: (value) =>
-        value?.length === 0 ? "Please upload brand assets" : null,
-      socialMediaLinks: (value) =>
-        value.length < 0 ? "Please add at least one social media link" : null,
-      privacyPolicy: (value) =>
-        value.length < 2 ? "Privacy policy is too short" : null,
-      age: (value) => {
-        return /^\d+$/.test(value.toString())
-          ? null
-          : "Please enter only numbers";
-      },
-      location: (value) =>
-        value.length < 2 ? "Target audience location is not valid" : null,
-      brandDetails: (value) =>
-        value.length < 2 ? "Market exploration is too short" : null,
+    });
+
+  const data = useMemo(
+    () =>
+      allStepperForm?.map((data) => {
+        const { id, companyOverview, brandDetails, socialMedia } = data;
+
+        return {
+          id,
+          name: companyOverview.companyName,
+          email: companyOverview.companyEmail,
+          website: companyOverview.companyWebsite,
+          location: brandDetails.location,
+          experience: brandDetails.age,
+          topProductsServicesCategories:
+            socialMedia.topProductsServicesCategories,
+        };
+      }) ?? [],
+    [allStepperForm]
+  );
+
+  const columns: ColumnDef<TableType>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          className="border-custom-blue"
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(!!value);
+            const allIds = data.map((row) => row.id);
+            setSelectedRowIds(table.getIsAllPageRowsSelected() ? [] : allIds);
+          }}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          className="border-custom-blue"
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(!!value);
+            const rowOriginal = row.original;
+            const rowId = rowOriginal.id;
+            if (value) {
+              setSelectedRowIds(
+                (prevSelectedRowIds) =>
+                  [...prevSelectedRowIds, rowId] as string[]
+              );
+            } else {
+              setSelectedRowIds((prevSelectedRowIds) =>
+                prevSelectedRowIds.filter((id) => id !== rowId)
+              );
+            }
+          }}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
     },
+    {
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="mx-3 pl-0 uppercase text-black-1 md:mx-0"
+          >
+            Organization Name
+            <ArrowUpIcon className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "name",
+    },
+    {
+      header: () => {
+        return (
+          <Button variant="ghost" className="pl-0 uppercase text-black-1">
+            Email
+          </Button>
+        );
+      },
+      accessorKey: "email",
+    },
+    {
+      header: () => {
+        return (
+          <Button variant="ghost" className="pl-0 uppercase text-black-1">
+            Website
+          </Button>
+        );
+      },
+      accessorKey: "website",
+    },
+    {
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="pl-0 uppercase text-black-1"
+          >
+            Experience
+            <ArrowUpIcon className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "experience",
+    },
+    {
+      header: () => {
+        return (
+          <Button variant="ghost" className="pl-0 uppercase text-black-1">
+            Location
+          </Button>
+        );
+      },
+      accessorKey: "location",
+    },
+    {
+      header: () => {
+        return (
+          <Button variant="ghost" className="pl-0 uppercase text-black-1">
+            Top Products, Services & Categories
+          </Button>
+        );
+      },
+      accessorKey: "topProductsServicesCategories",
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const stepper = row.original;
+
+        return (
+          <Pencil1Icon
+            className="h-4 w-4 cursor-pointer"
+            onClick={() => {
+              void router.push(`/mantine/update/${stepper.id}`);
+            }}
+          />
+        );
+      },
+    },
+  ];
+
+  const filterData = (data: TableType[], query: string) => {
+    if (!query) return data;
+
+    query = query.toLowerCase();
+
+    return data.filter((stepper) => {
+      return (
+        (typeof stepper.name === "string" &&
+          stepper.name.toLowerCase().includes(query)) ||
+        (typeof stepper.email === "string" &&
+          stepper.email.toLowerCase().includes(query)) ||
+        (typeof stepper.location === "string" &&
+          stepper.location.toLowerCase().includes(query)) ||
+        (typeof stepper.website === "string" &&
+          stepper.website.toLowerCase().includes(query)) ||
+        (typeof stepper.topProductsServicesCategories === "string" &&
+          stepper.topProductsServicesCategories.toLowerCase().includes(query))
+      );
+    });
+  };
+
+  const handleDeleteStepperFormData = (ids: string[]) => {
+    deleteMultipleStepperForm({
+      ids: ids,
+    });
+    setSelectedRowIds([]);
+  };
+
+  const filteredData = useMemo(() => {
+    return filterData(data, searchQuery);
+  }, [data, searchQuery]);
+
+  const table = useReactTable({
+    data: filteredData,
+    columns: columns,
+    enableRowSelection: true,
+    state: {
+      rowSelection,
+      sorting,
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    getSortedRowModel: getSortedRowModel(),
   });
 
-  const updateFieldValue = (name: string, value: any) => {
-    formData.setFieldValue(name, value);
-  };
-
-  const saveNewOnboardingFormImages = async (files: File[]) => {
-    const promises = [];
-    for (const file of files) {
-      const storageRef = ref(
-        storage,
-        `images/onboarding-form/${formData.values.companyEmail}/${
-          formData.values.companyName
-        }-${new Date().getTime()}.zip`
-      );
-
-      const uploadPromise = uploadBytes(storageRef, file);
-      promises.push(uploadPromise);
-    }
-
-    try {
-      const snapshots = await Promise.all(promises);
-      const downloadURLs = await Promise.all(
-        snapshots.map((snapshot) => getDownloadURL(snapshot.ref))
-      );
-
-      await updateDoc(doc(db, "onboarding-test", formData.values.companyName), {
-        images: downloadURLs,
-      });
-
-      console.log("downloadURLs", downloadURLs);
-    } catch (error) {
-      console.error("Error uploading files:", error);
-    }
-  };
-
-  const onSubmitForm = (e: FormEvent) => {
-    e.preventDefault();
-    open();
-    void saveNewOnboardingFormImages([
-      formData.values?.uploadSquareLogo,
-    ] as File[]);
-    void saveNewOnboardingFormImages(formData.values?.brandAssets as File[]);
-    console.log("data", formData.values);
-  };
-
-  const nextStep = () =>
-    setActive((current) =>
-      current < initialSteps.length ? current + 1 : current
-    );
-  const prevStep = () =>
-    setActive((current) => (current > 1 ? current - 1 : current));
   return (
     <MainLayout>
-      <Modal opened={opened} onClose={close} title="Onboarding Form Data">
-        <div className="flex flex-col gap-7">
-          {Object.entries(formData.values).map(([key, value]) => (
-            <div className="font-normal" key={key}>
-              <span className="font-bold uppercase">
-                {key?.split(/(?=[A-Z])/).join(" ")}
-              </span>
-              :<>{JSON.stringify(value)}</>
-            </div>
-          ))}
-          <Group position="center">
-            <Button
-              className="bg-black hover:bg-gray-800"
-              onClick={() => {
-                close();
-                formData.reset();
-                alert("Form submitted successfully!");
-              }}
-            >
-              Agree and Continue
-            </Button>
-          </Group>
+      <div className="flex justify-between pt-7 basis-9">
+        <div className="flex gap-2 justify-between">
+          <button onClick={() => handleDeleteStepperFormData(selectedRowIds)}>
+            <TrashIcon color="black" className="w-6 h-6" />
+          </button>
+          <TextInput
+            value={searchQuery}
+            onChange={handleSearchChange}
+            rightSection={<MagnifyingGlassIcon color="black" />}
+          />
         </div>
-      </Modal>
-      <MantineStepper active={active} setActive={setActive} />
-      {active === 1 && (
-        <CompanyOverviewForm
-          formData={formData}
-          updateFieldValue={updateFieldValue}
-        />
-      )}
-      {active === 2 && (
-        <SocialMediaForm
-          formData={formData}
-          updateFieldValue={updateFieldValue}
-        />
-      )}
-      {active === 3 && (
-        <BrandDetailsForm
-          formData={formData}
-          updateFieldValue={updateFieldValue}
-        />
-      )}
-      <Group position="center" mt="xl">
-        {active > 1 && (
-          <Button variant="default" onClick={prevStep}>
-            Back
-          </Button>
-        )}
         <Button
-          className="bg-black hover:bg-gray-800"
-          onClick={active < initialSteps.length ? nextStep : onSubmitForm}
+          className="w-fit text-end hover:bg-black bg-black"
+          onClick={() => router.push("/mantine/new")}
         >
-          {active < initialSteps.length ? "Next step" : "Save"}
+          <div className="flex items-center gap-2">
+            <PlusIcon />
+            <p>Create New</p>
+          </div>
         </Button>
-      </Group>
+      </div>
+      <div className="flex flex-1 flex-col overflow-y-scroll text-black ">
+        <DataTable table={table} columns={columns} />
+      </div>
+      <DataTablePagination table={table} />
     </MainLayout>
   );
 };
 
-export default Onboarding;
+export default MantineIndex;
