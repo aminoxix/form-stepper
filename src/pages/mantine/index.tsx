@@ -65,7 +65,7 @@ const MantineIndex = () => {
         console.log("Error deleting stepper form", error);
         notifications.show({
           title: "Deletion Unsuccessful",
-          message: "Form has been failed to delete!",
+          message: `Form has been failed to delete ${error.message}`,
           color: "red",
         });
       },
@@ -288,10 +288,12 @@ const MantineIndex = () => {
           </div>
         </Button>
       </div>
-      <div className="flex flex-1 flex-col overflow-y-scroll text-black ">
+      <div className="flex flex-1 flex-col overflow-y-scroll text-black">
         <DataTable table={table} columns={columns} />
       </div>
-      <DataTablePagination table={table} />
+      <div className="text-black">
+        <DataTablePagination table={table} />
+      </div>
     </MainLayout>
   );
 };

@@ -2,8 +2,8 @@ import React, { FormEvent, useState } from "react";
 
 // Layout
 import MainLayout from "../layout";
-import { FormData } from "@/types";
-import { initialSteps, INITIAL_DATA } from "@/data";
+import { FormCoreData } from "@/types";
+import { initialSteps, INITIAL_CORE_DATA } from "@/data";
 
 // Hooks
 import { useMultiStepForm } from "@/hooks/useMultistepForm";
@@ -17,10 +17,10 @@ import { SocialMediaForm } from "@/components/core/forms/SocialMedia";
 import { BrandDetailsForm } from "@/components/core/forms/BrandDetails";
 
 const Core = () => {
-  const [formData, setFormData] = useState(INITIAL_DATA);
+  const [formData, setFormData] = useState(INITIAL_CORE_DATA);
   const [steps, setSteps] = useState(initialSteps); // State to store the steps
 
-  function updateFields(fields: Partial<FormData>) {
+  function updateFields(fields: Partial<FormCoreData>) {
     setFormData((prevData) => {
       return { ...prevData, ...fields };
     });

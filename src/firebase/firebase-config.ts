@@ -8,30 +8,14 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// const firebaseConfig = {
-//   apiKey: process.env.REACT_APP_FIRESTORE_API_KEY,
-//   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-//   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-//   storageBucket: "xamtac-test.appspot.com",
-//   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-//   appId: process.env.REACT_APP_FIREBASE_APP_ID,
-//   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
-// };
-
 const firebaseConfig = {
-  apiKey: "AIzaSyA28by6GaRSU28J0q4sPQnJOBJFseZZggE",
-
-  authDomain: "aminos-personal.firebaseapp.com",
-
-  projectId: "aminos-personal",
-
-  storageBucket: "aminos-personal.appspot.com",
-
-  messagingSenderId: "354228032244",
-
-  appId: "1:354228032244:web:784b6aa567be112e9cc4a1",
-
-  measurementId: "G-WCQYNZN33V",
+  apiKey: process.env.REACT_APP_FIRESTORE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: "xamtac-test.appspot.com",
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

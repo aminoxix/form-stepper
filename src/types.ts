@@ -1,7 +1,8 @@
-import { INITIAL_DATA } from "./data";
+import { INITIAL_MANTINE_DATA, INITIAL_CORE_DATA } from "./data";
 
 // form
-export type FormData = typeof INITIAL_DATA;
+export type FormMantineData = typeof INITIAL_MANTINE_DATA;
+export type FormCoreData = typeof INITIAL_CORE_DATA;
 
 export type FormDataType = {
   companyName: string;

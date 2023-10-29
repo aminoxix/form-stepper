@@ -19,7 +19,7 @@ export const initialSteps = [
   },
 ];
 
-export const INITIAL_DATA = {
+export const INITIAL_MANTINE_DATA = {
   companyName: "",
   companyURL: "",
   companyEmail: "",
@@ -30,6 +30,24 @@ export const INITIAL_DATA = {
   age: "",
   location: "",
   brandAssets: [],
+  brandDetails: "",
+  targetEntities: "",
+  targetEntitiesDetails: "",
+  successMeasure: "",
+  expectations: [{ type: "", details: "" }],
+};
+
+export const INITIAL_CORE_DATA = {
+  companyName: "",
+  companyURL: "",
+  companyEmail: "",
+  uploadSquareLogo: null as File | null,
+  privacyPolicy: "",
+  topProductsServicesCategories: "",
+  socialMediaLinks: [{ platform: "", url: "" }],
+  age: "",
+  location: "",
+  brandAssets: [] as File[],
   brandDetails: "",
   targetEntities: "",
   targetEntitiesDetails: "",

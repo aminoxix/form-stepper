@@ -1,15 +1,20 @@
-import React, { use, useState } from "react";
 import Link from "next/link";
-
-import { MantineIcon } from "../assets/icons/mantine-icon";
 import { useRouter } from "next/router";
+import React, { useState } from "react";
+
+import { Button, Group, Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { GearIcon } from "@radix-ui/react-icons";
+import { MantineIcon } from "../assets/icons/mantine-icon";
 
 const Sidebar = ({ toggleSidebar }: { toggleSidebar: boolean }) => {
   const router = useRouter();
+  const [opened, { open, close }] = useDisclosure(false);
+  const [isGearClicked, setIsGearClicked] = useState<boolean>(false);
 
   const navMenus = [
     {
-      icon: <i className="symbol">settings</i>,
+      icon: <GearIcon className="w-5 h-5" />,
       name: "Core",
       path: "/core",
     },
@@ -28,24 +33,46 @@ const Sidebar = ({ toggleSidebar }: { toggleSidebar: boolean }) => {
           : "-translate-x-full ease-in"
       }`}
     >
+      <Modal onClose={close} opened={isGearClicked} title="Are you sure?">
+        <div>
+          Core haven&apos;t integrated with backend yet, do you still wanna
+          continue?
+        </div>
+        <Group mt="xl" position="right">
+          <Button variant="outline" color="dark" onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            variant="outline"
+            color="red"
+            onClick={() => router.push("/core")}
+          >
+            Let&apos;s Check!
+          </Button>
+        </Group>
+      </Modal>
       <div className="flex flex-col gap-5">
         {navMenus.map((menu) => (
           <div
-            className={`flex items-center justify-center rounded-md p-2 ${
+            className={`flex items-center justify-center rounded-full p-2 ${
               router.pathname === menu.path && "bg-black"
             }`}
             key={menu.name}
           >
-            <Link
-              className={`${
+            <button
+              onClick={() => {
+                menu.name === "Mantine"
+                  ? router.push(menu.path)
+                  : setIsGearClicked(true);
+              }}
+              className={`w-5 h-5 flex justify-center items-center ${
                 router.pathname === menu.path
                   ? "text-white"
                   : "mix-blend-exclusion"
               }`}
-              href={menu.path}
             >
               {menu.icon}
-            </Link>
+            </button>
           </div>
         ))}
       </div>

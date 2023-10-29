@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRouter } from "next/router";
 
-import React, { type FormEvent, useState } from "react";
+import React, { type FormEvent, useState, useEffect } from "react";
 
 import MainLayout from "@/pages/layout";
 
@@ -23,11 +23,14 @@ import { storage } from "@/firebase/firebase-config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { api } from "@/utils/api";
 
-const NewStepperForm = () => {
+const UpdateStepperForm = () => {
   const router = useRouter();
+  const stepperFormId = router.query.id as string;
+
   const [active, setActive] = useState(1);
   const [squareLogoFile, setSquareLogoFile] = useState<string>("");
   const [brandAssetsFiles, setBrandAssetsFiles] = useState<string[]>([]);
+  const [brandAssetsUrls, setBrandAssetsUrls] = useState<string[]>([]);
 
   const [facebookLink, setFacebookLink] = useState<string>("");
   const [twitterLink, setTwitterLink] = useState<string>("");
@@ -37,24 +40,25 @@ const NewStepperForm = () => {
 
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { mutate: createStepperForm } = api.stepper.addStepperForm.useMutation({
-    onSuccess: () => {
-      router.push("/mantine");
-      notifications.show({
-        title: "Created Successfully",
-        message: "Form has been created successfully!",
-        color: "green",
-      });
-    },
-    onError: (error) => {
-      console.log("Error creating stepper form", error);
-      notifications.show({
-        title: "Creation Unsuccessful",
-        message: `Form has been failed to create ${error.message}`,
-        color: "red",
-      });
-    },
-  });
+  const { mutate: updateStepperForm } =
+    api.stepper.updateStepperForm.useMutation({
+      onSuccess: () => {
+        router.push("/mantine");
+        notifications.show({
+          title: "Updated Successfully",
+          message: "Form has been updated successfully!",
+          color: "green",
+        });
+      },
+      onError: (error) => {
+        console.log("Error updating stepper form", error);
+        notifications.show({
+          title: "Update Unsuccessful",
+          message: `Form has been failed to update ${error.message}`,
+          color: "red",
+        });
+      },
+    });
 
   const formData = useForm<FormDataType>({
     initialValues: INITIAL_MANTINE_DATA,
@@ -72,23 +76,59 @@ const NewStepperForm = () => {
       },
       uploadSquareLogo: (value) =>
         value?.length === 0 ? "Please upload a square logo" : null,
-      brandAssets: (value) =>
-        value?.length === 0 ? "Please upload brand assets" : null,
-      socialMediaLinks: (value) =>
-        value.length < 0 ? "Please add at least one social media link" : null,
       privacyPolicy: (value) =>
         value.length < 2 ? "Privacy policy is too short" : null,
+      brandAssets: (value) =>
+        value?.length === 0 ? "Please upload brand assets" : null,
+      topProductsServicesCategories: (value) =>
+        value.length < 2
+          ? "Please write more about your top products, services & categories"
+          : null,
+      socialMediaLinks: (value) =>
+        value.length < 0 ? "Please add at least one social media link" : null,
       age: (value) => {
-        return /^\d+$/.test(value.toString())
+        return /^\d+$/.test(value?.toString())
           ? null
           : "Please enter only numbers";
       },
       location: (value) =>
-        value.length < 2 ? "Target audience location is not valid" : null,
+        value?.length < 2 ? "Target audience location is not valid" : null,
       brandDetails: (value) =>
-        value.length < 2 ? "Market exploration is too short" : null,
+        value?.length < 2 ? "Market exploration is too short" : null,
     },
   });
+
+  const { data: stepperFormData, mutate: getStepperFormDataMutation } =
+    api.stepper.getStepperForm.useMutation({
+      onSuccess: (data) => {
+        if (data) {
+          setFacebookLink(data.socialMedia.facebookLink as string);
+          setInstagramLink(data.socialMedia.instagramLink as string);
+          setLinkedInLink(data.socialMedia.linkedinLink as string);
+          setTwitterLink(data.socialMedia.xLink as string);
+          setYouTubeLink(data.socialMedia.youtubeLink as string);
+          setBrandAssetsUrls(data.brandDetails.brandAssets ?? []);
+          formData.setValues({
+            companyName: data.companyOverview.companyName,
+            companyURL: data.companyOverview.companyWebsite ?? "",
+            companyEmail: data.companyOverview.companyEmail,
+            uploadSquareLogo: data.companyOverview.uploadSquareLogo,
+            privacyPolicy: data.companyOverview.legalCompliances,
+            topProductsServicesCategories:
+              data.socialMedia.topProductsServicesCategories,
+            age: data.brandDetails.age,
+            location: data.brandDetails.location,
+            brandDetails: data.brandDetails.brandDetails,
+          });
+        }
+      },
+    });
+
+  useEffect(() => {
+    getStepperFormDataMutation({
+      stepperId: stepperFormId,
+    });
+  }, [getStepperFormDataMutation, stepperFormId]);
 
   const updateFieldValue = (name: string, value: any) => {
     formData.setFieldValue(name, value);
@@ -192,15 +232,16 @@ const NewStepperForm = () => {
 
     if (Array.isArray(brandAssetsFiles)) {
       // Multiple file upload
-      const brandAssetsUrls = (await Promise.all(
+      const brandAssetUrls = (await Promise.all(
         brandAssetsFiles.map(async (file) => uploadFileOnFirebase(file))
       )) as string[];
       // setUploadingOverlay(true);
 
       formData.setFieldValue(
         "brandAssets",
-        // stepperFormData ? [...logoUrls, ...logosUrls] : logosUrls,
-        brandAssetsUrls
+        stepperFormData
+          ? [...brandAssetsUrls, ...brandAssetUrls]
+          : brandAssetsUrls
       );
 
       // setUploadingOverlay(true);
@@ -230,7 +271,8 @@ const NewStepperForm = () => {
     });
 
     e.preventDefault();
-    createStepperForm({
+    updateStepperForm({
+      id: stepperFormId,
       companyOverViewData: {
         companyName: formData.values.companyName,
         companyEmail: formData.values.companyEmail,
@@ -292,26 +334,63 @@ const NewStepperForm = () => {
       name: " What are your social media links?",
       value: formData.values.socialMediaLinks.map((val) => {
         return (
-          <div key={val.platform}>
-            <span className="font-semibold">{val.platform}: </span>
-            <span>{val.url}</span>
-          </div>
+          <>
+            {stepperFormData ? (
+              <div className="flex flex-col gap-2">
+                {stepperFormData.socialMedia.facebookLink !== "" && (
+                  <>
+                    <span className="font-semibold">Facebook: </span>
+                    <span>{stepperFormData.socialMedia.facebookLink}</span>
+                  </>
+                )}
+                {stepperFormData.socialMedia.linkedinLink !== "" && (
+                  <>
+                    <span className="font-semibold">LinkedIn: </span>
+                    <span>{stepperFormData.socialMedia.linkedinLink}</span>
+                  </>
+                )}
+                {stepperFormData.socialMedia.instagramLink !== "" && (
+                  <>
+                    <span className="font-semibold">Instagram: </span>
+                    <span>{stepperFormData.socialMedia.instagramLink}</span>
+                  </>
+                )}
+                {stepperFormData.socialMedia.xLink !== "" && (
+                  <>
+                    <span className="font-semibold">Twitter/ X: </span>
+                    <span>{stepperFormData.socialMedia.xLink}</span>
+                  </>
+                )}
+                {stepperFormData.socialMedia.youtubeLink !== "" && (
+                  <>
+                    <span className="font-semibold">YouTube: </span>
+                    <span>{stepperFormData.socialMedia.youtubeLink}</span>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div key={val.platform}>
+                <span className="font-semibold">{val.platform}: </span>
+                <span>{val.url}</span>
+              </div>
+            )}
+          </>
         );
       }),
     },
     {
-      id: 9,
+      id: 5,
       name: "Are there any legal, privacy, or compliance requirements we should be aware of?",
       value:
         formData.values.privacyPolicy.charAt(0).toUpperCase() +
         formData.values.privacyPolicy.slice(1),
     },
     {
-      id: 13,
+      id: 6,
       name: "What are your top products, services & categories?",
       value:
-        formData.values.topProductsServicesCategories.charAt(0).toUpperCase() +
-        formData.values.topProductsServicesCategories.slice(1),
+        formData.values.topProductsServicesCategories?.charAt(0).toUpperCase() +
+        formData.values.topProductsServicesCategories?.slice(1),
     },
   ];
 
@@ -419,6 +498,8 @@ const NewStepperForm = () => {
           formData={formData}
           updateFieldValue={updateFieldValue}
           handleFileUpload={handleFileUpload}
+          brandAssetsUrls={brandAssetsUrls}
+          setBrandAssetsUrls={setBrandAssetsUrls}
         />
       )}
       <Group position="center" mt="xl">
@@ -438,4 +519,4 @@ const NewStepperForm = () => {
   );
 };
 
-export default NewStepperForm;
+export default UpdateStepperForm;

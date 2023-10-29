@@ -2,6 +2,8 @@ import "@/styles/globals.css";
 import { api } from "@/utils/api";
 import type { AppProps } from "next/app";
 
+import { Notifications } from "@mantine/notifications";
+
 import localFont from "next/font/local";
 
 const materialSymbols = localFont({
@@ -16,6 +18,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <div className={materialSymbols.variable}>
       <Component {...pageProps} />
+      <Notifications position="top-right" zIndex={2077} />
     </div>
   );
 }

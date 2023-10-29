@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-i.symbol {
+/* google icon */
+/* i.symbol {
   font-family: var(--font-family-symbols);
   font-weight: normal;
   font-style: normal;
@@ -19,7 +20,7 @@ i.symbol {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: "liga";
-}
+} */
 
 :root {
   --foreground-rgb: 0, 0, 0;

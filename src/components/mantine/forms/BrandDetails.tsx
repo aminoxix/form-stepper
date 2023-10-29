@@ -1,4 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
+
 import React from "react";
+import { useRouter } from "next/router";
 
 import { type UseFormReturnType } from "@mantine/form";
 import type { FormDataType } from "@/types";
@@ -6,19 +9,63 @@ import type { FormDataType } from "@/types";
 import { FormWrapper } from "@/components/FormWrapper";
 
 import { TextInput, FileInput, Text } from "@mantine/core";
+import { CrossCircledIcon } from "@radix-ui/react-icons";
 
 export function BrandDetailsForm({
   formData,
   updateFieldValue,
   handleFileUpload,
-}: {
+  brandAssetsUrls,
+  setBrandAssetsUrls,
+}: // stepperFormData,
+{
   formData: UseFormReturnType<
     FormDataType,
     (values: FormDataType) => FormDataType
   >;
   updateFieldValue: (name: string, value: any) => void;
   handleFileUpload: (file: File | File[] | null, logoType: string) => void;
+  brandAssetsUrls?: string[];
+  setBrandAssetsUrls?: React.Dispatch<React.SetStateAction<string[]>>;
+  // stepperFormData?:
+  //   | {
+  //       companyOverview: {
+  //         id: string;
+  //         createdAt: Date;
+  //         updatedAt: Date;
+  //         companyName: string;
+  //         companyEmail: string;
+  //         companyWebsite: string | null;
+  //         uploadSquareLogo: string;
+  //         legalCompliances: string;
+  //       };
+  //       brandDetails: {
+  //         id: string;
+  //         createdAt: Date;
+  //         updatedAt: Date;
+  //         age: string;
+  //         location: string;
+  //         brandAssets: string[];
+  //         brandDetails: string;
+  //       };
+  //       socialMedia: {
+  //         id: string;
+  //         createdAt: Date;
+  //         updatedAt: Date;
+  //         topProductsServicesCategories: string;
+  //         facebookLink: string;
+  //         instagramLink: string;
+  //         linkedinLink: string;
+  //         xLink: string;
+  //         youtubeLink: string;
+  //       };
+  //     }
+  //   | null
+  //   | undefined;
 }) {
+  const router = useRouter();
+  const id = router.query.id;
+
   return (
     <FormWrapper>
       <form className="flex flex-col gap-4">
@@ -38,7 +85,6 @@ export function BrandDetailsForm({
           />
           <TextInput
             className="w-1/2"
-            autoFocus
             withAsterisk
             required
             type="text"
@@ -50,9 +96,33 @@ export function BrandDetailsForm({
             }
           />
         </div>
+        {id && (
+          <div className="flex w-full gap-4 overflow-y-scroll bg-primary p-1 md:h-44 md:gap-x-6 md:gap-y-6 md:p-2">
+            {brandAssetsUrls?.map((brandAsset, index) => (
+              <div key={index} className="relative">
+                <img src={brandAsset} alt="" className="h-20 md:h-40" />
+                <button
+                  onClick={(event) => {
+                    event.preventDefault();
+                    const updatedUrls = brandAssetsUrls?.filter(
+                      (url) => url !== brandAsset
+                    );
+                    setBrandAssetsUrls && setBrandAssetsUrls(updatedUrls);
+                    formData.setValues((prev) => ({
+                      ...prev,
+                      logos: updatedUrls,
+                    }));
+                  }}
+                  className="absolute bottom-1 left-1 z-20"
+                >
+                  <CrossCircledIcon />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <FileInput
           className="w-full"
-          autoFocus
           withAsterisk
           placeholder="Upload Image here"
           multiple
@@ -68,7 +138,6 @@ export function BrandDetailsForm({
         />
         <TextInput
           className="w-full"
-          autoFocus
           withAsterisk
           required
           type="text"

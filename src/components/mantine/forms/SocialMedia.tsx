@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React, { forwardRef } from "react";
 
 import { type UseFormReturnType } from "@mantine/form";
@@ -59,6 +60,9 @@ export function SocialMediaForm({
   youtubeLink: string;
   setYouTubeLink: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const router = useRouter();
+  const id = router.query.id;
+
   return (
     <FormWrapper>
       <form className="flex flex-col gap-4">
@@ -69,10 +73,10 @@ export function SocialMediaForm({
           type="text"
           name="topProductsServicesCategories"
           {...formData.getInputProps("topProductsServicesCategories")}
-          onChange={(value) => {
+          onChange={(event) => {
             updateFieldValue(
               "topProductsServicesCategories",
-              value.currentTarget.value
+              event.currentTarget.value
             );
           }}
           label="What are your top products, services & categories?"
@@ -81,10 +85,11 @@ export function SocialMediaForm({
           <Text className="text-sm font-medium">
             What are your social media links?
           </Text>
-          <>
-            {formData.values.socialMediaLinks?.map((link, index) => (
-              <div className="flex w-full gap-2" key={index}>
+          {id ? (
+            <div className="flex w-full flex-col gap-3">
+              <div className="flex w-full gap-3">
                 <Select
+                  value="Facebook"
                   placeholder="Pick one"
                   itemComponent={SelectItem}
                   data={data.map((option) => ({
@@ -93,82 +98,211 @@ export function SocialMediaForm({
                       (value) => value.platform === option.value
                     ),
                   }))}
-                  name="platform"
-                  searchable
-                  clearable
-                  required
-                  withAsterisk
-                  maxDropdownHeight={400}
-                  nothingFound="Nobody here"
                   filter={(value, item) =>
                     item.label
                       ?.toLowerCase()
                       .includes(value.toLowerCase().trim()) || false
                   }
-                  {...formData.getInputProps(
-                    `socialMediaLinks.${index}.platform`
-                  )}
-                  onChange={(value) => {
-                    updateFieldValue(
-                      `socialMediaLinks.${index}.platform`,
-                      value
-                    );
-                  }}
                 />
                 <TextInput
                   className="w-full"
-                  withAsterisk
-                  required
-                  type="text"
-                  name="url"
-                  label=""
-                  value={
-                    link.platform === "Facebook"
-                      ? facebookLink
-                      : link.platform === "Twitter"
-                      ? twitterLink
-                      : link.platform === "LinkedIn"
-                      ? linkedinLink
-                      : link.platform === "Instagram"
-                      ? instagramLink
-                      : youtubeLink
+                  value={facebookLink}
+                  onChange={(event) =>
+                    setFacebookLink(event.currentTarget.value)
                   }
-                  onChange={(event) => {
-                    updateFieldValue(
-                      `socialMediaLinks.${index}.url`,
-                      event.currentTarget.value
-                    );
-                    if (link.platform === "Facebook") {
-                      setFacebookLink(event.currentTarget.value);
-                    } else if (link.platform === "Twitter") {
-                      setTwitterLink(event.currentTarget.value);
-                    } else if (link.platform === "LinkedIn") {
-                      setLinkedInLink(event.currentTarget.value);
-                    } else if (link.platform === "Instagram") {
-                      setInstagramLink(event.currentTarget.value);
-                    } else {
-                      setYouTubeLink(event.currentTarget.value);
-                    }
-                  }}
                 />
               </div>
-            ))}
-            <div className="flex justify-end">
-              <button
-                className="w-fit text-blue-500"
-                onClick={() => {
-                  const updatedLinks = [
-                    ...(formData.values.socialMediaLinks || []),
-                    { platform: "", url: "" },
-                  ];
-                  formData.setFieldValue("socialMediaLinks", updatedLinks);
-                }}
-                type="button"
-              >
-                Add more
-              </button>
+              <div className="flex w-full gap-3">
+                <Select
+                  value="Twitter"
+                  placeholder="Pick one"
+                  itemComponent={SelectItem}
+                  data={data.map((option) => ({
+                    ...option,
+                    disabled: formData.values.socialMediaLinks?.some(
+                      (value) => value.platform === option.value
+                    ),
+                  }))}
+                  filter={(value, item) =>
+                    item.label
+                      ?.toLowerCase()
+                      .includes(value.toLowerCase().trim()) || false
+                  }
+                />
+                <TextInput
+                  className="w-full"
+                  value={twitterLink}
+                  onChange={(event) =>
+                    setTwitterLink(event.currentTarget.value)
+                  }
+                />
+              </div>
+              <div className="flex w-full gap-3">
+                <Select
+                  value="LinkedIn"
+                  placeholder="Pick one"
+                  itemComponent={SelectItem}
+                  data={data.map((option) => ({
+                    ...option,
+                    disabled: formData.values.socialMediaLinks?.some(
+                      (value) => value.platform === option.value
+                    ),
+                  }))}
+                  filter={(value, item) =>
+                    item.label
+                      ?.toLowerCase()
+                      .includes(value.toLowerCase().trim()) || false
+                  }
+                />
+                <TextInput
+                  className="w-full"
+                  value={linkedinLink}
+                  onChange={(event) =>
+                    setLinkedInLink(event.currentTarget.value)
+                  }
+                />
+              </div>
+              <div className="flex w-full gap-3">
+                <Select
+                  value="Instagram"
+                  placeholder="Pick one"
+                  itemComponent={SelectItem}
+                  data={data.map((option) => ({
+                    ...option,
+                    disabled: formData.values.socialMediaLinks?.some(
+                      (value) => value.platform === option.value
+                    ),
+                  }))}
+                  filter={(value, item) =>
+                    item.label
+                      ?.toLowerCase()
+                      .includes(value.toLowerCase().trim()) || false
+                  }
+                />
+                <TextInput
+                  className="w-full"
+                  value={instagramLink}
+                  onChange={(event) =>
+                    setInstagramLink(event.currentTarget.value)
+                  }
+                />
+              </div>
+              <div className="flex w-full gap-3">
+                <Select
+                  value="YouTube"
+                  placeholder="Pick one"
+                  itemComponent={SelectItem}
+                  data={data.map((option) => ({
+                    ...option,
+                    disabled: formData.values.socialMediaLinks?.some(
+                      (value) => value.platform === option.value
+                    ),
+                  }))}
+                  filter={(value, item) =>
+                    item.label
+                      ?.toLowerCase()
+                      .includes(value.toLowerCase().trim()) || false
+                  }
+                />
+                <TextInput
+                  className="w-full"
+                  value={youtubeLink}
+                  onChange={(event) =>
+                    setYouTubeLink(event.currentTarget.value)
+                  }
+                />
+              </div>
             </div>
-          </>
+          ) : (
+            <>
+              {formData.values.socialMediaLinks?.map((link, index) => (
+                <div className="flex w-full gap-2" key={index}>
+                  <Select
+                    placeholder="Pick one"
+                    itemComponent={SelectItem}
+                    data={data.map((option) => ({
+                      ...option,
+                      disabled: formData.values.socialMediaLinks?.some(
+                        (value) => value.platform === option.value
+                      ),
+                    }))}
+                    name="platform"
+                    searchable
+                    clearable
+                    required
+                    withAsterisk
+                    maxDropdownHeight={400}
+                    nothingFound="Nobody here"
+                    filter={(value, item) =>
+                      item.label
+                        ?.toLowerCase()
+                        .includes(value.toLowerCase().trim()) || false
+                    }
+                    {...formData.getInputProps(
+                      `socialMediaLinks.${index}.platform`
+                    )}
+                    onChange={(value) => {
+                      updateFieldValue(
+                        `socialMediaLinks.${index}.platform`,
+                        value
+                      );
+                    }}
+                  />
+                  <TextInput
+                    className="w-full"
+                    withAsterisk
+                    required
+                    type="text"
+                    name="url"
+                    label=""
+                    value={
+                      link.platform === "Facebook"
+                        ? facebookLink
+                        : link.platform === "Twitter"
+                        ? twitterLink
+                        : link.platform === "LinkedIn"
+                        ? linkedinLink
+                        : link.platform === "Instagram"
+                        ? instagramLink
+                        : youtubeLink
+                    }
+                    onChange={(event) => {
+                      updateFieldValue(
+                        `socialMediaLinks.${index}.url`,
+                        event.currentTarget.value
+                      );
+                      if (link.platform === "Facebook") {
+                        setFacebookLink(event.currentTarget.value);
+                      } else if (link.platform === "Twitter") {
+                        setTwitterLink(event.currentTarget.value);
+                      } else if (link.platform === "LinkedIn") {
+                        setLinkedInLink(event.currentTarget.value);
+                      } else if (link.platform === "Instagram") {
+                        setInstagramLink(event.currentTarget.value);
+                      } else {
+                        setYouTubeLink(event.currentTarget.value);
+                      }
+                    }}
+                  />
+                </div>
+              ))}
+              <div className="flex justify-end">
+                <button
+                  className="w-fit text-blue-500"
+                  onClick={() => {
+                    const updatedLinks = [
+                      ...(formData.values.socialMediaLinks || []),
+                      { platform: "", url: "" },
+                    ];
+                    formData.setFieldValue("socialMediaLinks", updatedLinks);
+                  }}
+                  type="button"
+                >
+                  Add more
+                </button>
+              </div>
+            </>
+          )}
         </>
       </form>
     </FormWrapper>
