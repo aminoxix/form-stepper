@@ -1,6 +1,6 @@
+import { TRPCClientError } from "@trpc/client";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { TRPCClientError } from "@trpc/client";
 
 export const stepperFormRouter = createTRPCRouter({
   addStepperForm: publicProcedure
@@ -30,22 +30,26 @@ export const stepperFormRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const createdCompanyOverview = await ctx.db.companyOverview.create({
-        data: {
-          ...input.companyOverViewData,
-        },
-      });
+      const createdCompanyOverview =
+        await ctx.db.stepperFormCompanyOverview.create({
+          data: {
+            ...input.companyOverViewData,
+          },
+        });
 
-      const createdSocialMedia = await ctx.db.socialMediaDetails.create({
-        data: {
-          ...input.socialMediaData,
-        },
-      });
-      const createdBrandGuideline = await ctx.db.brandDetails.create({
-        data: {
-          ...input.brandDetailsData,
-        },
-      });
+      const createdSocialMedia =
+        await ctx.db.stepperFormSocialMediaDetails.create({
+          data: {
+            ...input.socialMediaData,
+          },
+        });
+      const createdBrandGuideline = await ctx.db.stepperFormBrandDetails.create(
+        {
+          data: {
+            ...input.brandDetailsData,
+          },
+        }
+      );
 
       return await ctx.db.stepperForm.create({
         data: {
@@ -160,30 +164,34 @@ export const stepperFormRouter = createTRPCRouter({
         },
       });
 
-      const createdCompanyOverview = await ctx.db.companyOverview.update({
-        where: {
-          id: stepperData?.companyOverviewId,
-        },
-        data: {
-          ...input.companyOverViewData,
-        },
-      });
-      const createdSocialMedia = await ctx.db.socialMediaDetails.update({
-        where: {
-          id: stepperData?.socialMediaId,
-        },
-        data: {
-          ...input.socialMediaData,
-        },
-      });
-      const createdBrandGuideline = await ctx.db.brandDetails.update({
-        where: {
-          id: stepperData?.brandDetailId,
-        },
-        data: {
-          ...input.brandDetailsData,
-        },
-      });
+      const createdCompanyOverview =
+        await ctx.db.stepperFormCompanyOverview.update({
+          where: {
+            id: stepperData?.companyOverviewId,
+          },
+          data: {
+            ...input.companyOverViewData,
+          },
+        });
+      const createdSocialMedia =
+        await ctx.db.stepperFormSocialMediaDetails.update({
+          where: {
+            id: stepperData?.socialMediaId,
+          },
+          data: {
+            ...input.socialMediaData,
+          },
+        });
+      const createdBrandGuideline = await ctx.db.stepperFormBrandDetails.update(
+        {
+          where: {
+            id: stepperData?.brandDetailId,
+          },
+          data: {
+            ...input.brandDetailsData,
+          },
+        }
+      );
 
       const stepperFormExist = await ctx.db.stepperForm.count();
 

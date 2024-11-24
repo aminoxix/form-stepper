@@ -1,27 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRouter } from "next/router";
 
-import React, { type FormEvent, useState, useEffect } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 
 import MainLayout from "@/pages/layout";
 
-import type { FormDataType } from "@/types";
 import { INITIAL_MANTINE_DATA, initialSteps } from "@/data";
+import type { FormDataType } from "@/types";
 
 import { Button, Group, Modal } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 
-import { useForm } from "@mantine/form";
+import { BrandDetailsForm } from "@/components/mantine/forms/BrandDetails";
 import { CompanyOverviewForm } from "@/components/mantine/forms/CompanyOverview";
 import { SocialMediaForm } from "@/components/mantine/forms/SocialMedia";
-import { BrandDetailsForm } from "@/components/mantine/forms/BrandDetails";
+import { useForm } from "@mantine/form";
 
 import MantineStepper from "@/components/mantine/Stepper";
 
 import { storage } from "@/firebase/firebase-config";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { api } from "@/utils/api";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const UpdateStepperForm = () => {
   const router = useRouter();

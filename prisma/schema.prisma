@@ -11,53 +11,53 @@ datasource db {
 }
 
 model StepperForm {
-  id                        String                  @id @default(cuid())
-  createdAt                 DateTime                @default(now())
-  updatedAt                 DateTime                @updatedAt
-  companyOverviewId         String                  @unique
-  socialMediaId             String                  @unique
-  brandDetailId             String                  @unique
-  companyOverview           CompanyOverview         @relation(fields: [companyOverviewId], references: [id])
-  socialMedia               SocialMediaDetails      @relation(fields: [socialMediaId], references: [id])
-  brandDetails              BrandDetails            @relation(fields: [brandDetailId], references: [id])
+  id                String                        @id @default(cuid())
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+  companyOverviewId String                        @unique
+  socialMediaId     String                        @unique
+  brandDetailId     String                        @unique
+  companyOverview   StepperFormCompanyOverview    @relation(fields: [companyOverviewId], references: [id])
+  socialMedia       StepperFormSocialMediaDetails @relation(fields: [socialMediaId], references: [id])
+  brandDetails      StepperFormBrandDetails       @relation(fields: [brandDetailId], references: [id])
 
   @@index([companyOverviewId])
   @@index([socialMediaId])
   @@index([brandDetailId])
 }
 
-model CompanyOverview {
-  id                        String          @id @default(cuid())
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
-  companyName               String          @unique
-  companyEmail              String          @unique
-  companyWebsite            String?
-  uploadSquareLogo          String
-  legalCompliances          String
-  stepperForm            StepperForm?
+model StepperFormCompanyOverview {
+  id               String       @id @default(cuid())
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  companyName      String       @unique
+  companyEmail     String       @unique
+  companyWebsite   String?
+  uploadSquareLogo String
+  legalCompliances String
+  stepperForm      StepperForm?
 }
 
-model SocialMediaDetails {
-  id                            String          @id @default(cuid())
-  createdAt                     DateTime        @default(now())
-  updatedAt                     DateTime        @updatedAt
+model StepperFormSocialMediaDetails {
+  id                            String       @id @default(cuid())
+  createdAt                     DateTime     @default(now())
+  updatedAt                     DateTime     @updatedAt
   topProductsServicesCategories String
   facebookLink                  String
   linkedinLink                  String
   instagramLink                 String
   youtubeLink                   String
   xLink                         String
-  stepperForm                StepperForm?
+  stepperForm                   StepperForm?
 }
 
-model BrandDetails {
-  id                           String          @id @default(cuid())
-  createdAt                    DateTime        @default(now())
-  updatedAt                    DateTime        @updatedAt
-  brandAssets                  String[]
-  age                          String
-  location                     String
-  brandDetails                 String
-  stepperForm               StepperForm?
+model StepperFormBrandDetails {
+  id           String       @id @default(cuid())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  brandAssets  String[]
+  age          String
+  location     String
+  brandDetails String
+  stepperForm  StepperForm?
 }
